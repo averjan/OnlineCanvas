@@ -55,6 +55,14 @@ html, body {
     background-color: #f6f4f4;
 }
 
+.tool-btn-chosen {
+    background-color: #eceaea;
+}
+
+.tool-btn-chosen:hover {
+    background-color: #eceaea;
+}
+
 .btn-contains {
     display: flex;
     align-items: center;
