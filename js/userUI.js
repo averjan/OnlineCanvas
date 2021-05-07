@@ -134,14 +134,11 @@ function drawPixel(x, y, pxSize, color) {
 
 function fill(x, y, size, oldColor, fillColor) {
     const maxPixel = colorMatrix.length
-    console.log(x + " " + y + " " + maxPixel)
     if ((x < 0) || (x >= maxPixel) || (y < 0) || (y >= maxPixel)) {
         return;
     }
 
-    console.log("ready" + x + " " + y + " " + colorMatrix[x][y])
     if (colorMatrix[x][y] === oldColor) {
-        console.log("draw" + x + " " + y + " " + maxPixel)
         drawPixel(x, y, size, fillColor)
         fill(x - 1, y, size, oldColor, fillColor)
         fill(x + 1, y, size, oldColor, fillColor)
@@ -149,3 +146,15 @@ function fill(x, y, size, oldColor, fillColor) {
         fill(x, y + 1, size, oldColor, fillColor)
     }
 }
+
+document.addEventListener('keypress', (e) => {
+    if (e.code === 'KeyB') {
+        fillButton.click()
+    }
+    else if (e.code === 'KeyP') {
+        pencilButton.click()
+    }
+    else if (e.code === 'KeyC') {
+        colorButton.click()
+    }
+})
