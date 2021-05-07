@@ -4,6 +4,7 @@ let ctx = canvas.getContext('2d')
 let pencilButton = document.querySelector('#pencil-btn')
 let fillButton = document.querySelector('#fill-btn')
 let colorButton = document.querySelector('#color-btn')
+let colorInput = document.querySelector('#color-input')
 let size4Button = document.querySelector('#size-4')
 let size16Button = document.querySelector('#size-16')
 let size32Button = document.querySelector('#size-32')
@@ -38,6 +39,10 @@ function loadForm() {
             el.classList.add('tool-btn-chosen')
         })
     }
+
+    pencilButton.click()
+    size4Button.click()
+    document.querySelector('#color-ico').style.backgroundColor = currentColor
 }
 
 canvas.addEventListener('click', (e) => mouseDraw(e))
@@ -54,6 +59,7 @@ fillButton.addEventListener('click', chooseFill)
 size4Button.addEventListener('click', (e) => choosePencilSize(4))
 size16Button.addEventListener('click', (e) => choosePencilSize(16))
 size32Button.addEventListener('click', (e) => choosePencilSize(32))
+colorButton.addEventListener('click', changeColor)
 
 function choosePencil(e) {
     drawTool = TOOL.pencil
@@ -66,6 +72,15 @@ function chooseFill(e) {
 function choosePencilSize(size) {
     drawSize = size
 }
+
+function changeColor() {
+    colorInput.click()
+}
+
+colorInput.addEventListener('change', (e) => {
+    document.querySelector('#color-ico').style.backgroundColor = colorInput.value
+    currentColor = colorInput.value
+})
 
 function mouseDraw(e) {
     draw(e.offsetX, e.offsetY, currentColor, drawTool)
