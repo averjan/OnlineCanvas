@@ -1,4 +1,5 @@
 // const { drawTool, TOOL, currentColor, canvasSize, drawSize } = require('constants.js')
+let currentRectangle = { x: -1, y: -1 }
 let canvas = document.querySelector('#user-canvas')
 let ctx = canvas.getContext('2d')
 let pencilButton = document.querySelector('#pencil-btn')
@@ -49,20 +50,29 @@ fillButton.addEventListener('click', () => {
 })
 
 function loadForm() {
-    /*
-    for (let el of document.querySelector('#tool-resize').getElementsByClassName('tool-btn')) {
-        el.addEventListener('click', () => {
-
-            disableSizes()
-            el.classList.add('tool-btn-chosen')
-        })
-    }
-    */
     pencilButton.click()
     size4Button.classList.add('tool-btn-chosen')
     document.querySelector('#color-ico').style.backgroundColor = currentColor
     clear(drawSize)
 }
+
+function makeTransparentRect(x, y, pxSize) {
+    let color = colorMatrix[x][y]
+    let pxOffsetX = x * pxSize
+    let pxOffsetY = y * pxSize
+    ctx.fillStyle = color
+    ctx.globalAlpha = 0.8
+    ctx.fillRect(pxOffsetX, pxOffsetY, pxSize, pxSize)
+}
+
+function makeLight(e) {
+    const x = e.offsetX
+    const y = e.offsetY
+    let pxSize = canvasSize / drawSize
+    let matrixX = Math.floor(x / pxSize)
+    let matrixY = Math.floor(y / pxSize)
+}
+
 
 canvas.addEventListener('click', (e) => mouseDraw(e))
 canvas.addEventListener('mousedown', (e) => {
