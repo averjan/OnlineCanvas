@@ -12,7 +12,8 @@ let mainPanel = document.querySelector('#main')
 let colorMatrix = []
 
 function rebuildMatrix(size, color) {
-    colorMatrix = Array(size).fill(Array(size).fill(color))
+    //colorMatrix = Array(size).fill(Array(size).fill(color))
+    colorMatrix = Array(size).fill(null).map(() => Array(size).fill(color));
     refresh(color, size)
 }
 
@@ -119,7 +120,7 @@ function draw(x, y, color, tool) {
         drawPixel(matrixX, matrixY, pxSize, color)
     }
     else if (tool === TOOL.fill) {
-        fill(matrixX, matrixY, pxSize, color)
+        fill(matrixX, matrixY, pxSize, colorMatrix[matrixX][matrixY], color)
     }
 }
 
@@ -131,6 +132,20 @@ function drawPixel(x, y, pxSize, color) {
     ctx.fillRect(pxOffsetX, pxOffsetY, pxSize, pxSize)
 }
 
-function fill(x, y, size, color) {
+function fill(x, y, size, oldColor, fillColor) {
+    const maxPixel = colorMatrix.length
+    console.log(x + " " + y + " " + maxPixel)
+    if ((x < 0) || (x >= maxPixel) || (y < 0) || (y >= maxPixel)) {
+        return;
+    }
 
+    console.log("ready" + x + " " + y + " " + colorMatrix[x][y])
+    if (colorMatrix[x][y] === oldColor) {
+        console.log("draw" + x + " " + y + " " + maxPixel)
+        drawPixel(x, y, size, fillColor)
+        fill(x - 1, y, size, oldColor, fillColor)
+        fill(x + 1, y, size, oldColor, fillColor)
+        fill(x, y - 1, size, oldColor, fillColor)
+        fill(x, y + 1, size, oldColor, fillColor)
+    }
 }
