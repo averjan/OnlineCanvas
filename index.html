@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div id="main">
+        <div id="control-panel">
+            <div id="tool-control">
+                <button id="pencil-btn" class="tool-btn">
+                    <span class="btn-contains">
+                        <img class="btn-img" src="img/btn/pencil.svg" alt="pencil">
+                        <span class="btn-txt">Pencil</span>
+                    </span>
+                </button>
+                <button id="fill-btn" class="tool-btn">
+                    <span class="btn-contains">
+                        <img class="btn-img" src="img/btn/fill.svg" alt="fill">
+                        <span class="btn-txt">Fill</span>
+                    </span>
+                </button>
+                <button id="color-btn" class="tool-btn">
+                    <span class="btn-contains">
+                        <input id="color-input" type="color">
+                        <span id="color-ico"></span>
+                        <span class="btn-txt">Color</span>
+                    </span>
+                </button>
+            </div>
+
+            <div id="tool-resize">
+                <button id="size-4" class="tool-btn">
+                    <span class="btn-txt">4x4</span>
+                </button>
+                <button id="size-16" class="tool-btn">
+                    <span class="btn-txt">16x16</span>
+                </button>
+                <button id="size-32" class="tool-btn">
+                    <span class="btn-txt">32x32</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="draw-panel">
+            <canvas id="user-canvas"></canvas>
+        </div>
+    </div>
+
+    <script src="js/userUI.js"></script>
+</body>
+</html>
