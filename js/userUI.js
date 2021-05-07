@@ -9,6 +9,21 @@ let size4Button = document.querySelector('#size-4')
 let size16Button = document.querySelector('#size-16')
 let size32Button = document.querySelector('#size-32')
 let mainPanel = document.querySelector('#main')
+let colorMatrix = []
+
+function rebuildMatrix(size, color) {
+    colorMatrix = Array(size).fill(Array(size).fill(color))
+    refresh(color, size)
+}
+
+function refresh(color, size) {
+    const realSize = canvasSize / size
+    colorMatrix.forEach((v, y) => v.forEach((val, x) => drawPixel(x, y, realSize, val)))
+}
+
+function clear(size) {
+    rebuildMatrix(size, '#ffffff')
+}
 
 function disableTools() {
     for (let el of document.querySelector('#tool-control').getElementsByClassName('tool-btn')) {
@@ -33,16 +48,19 @@ fillButton.addEventListener('click', () => {
 })
 
 function loadForm() {
+    /*
     for (let el of document.querySelector('#tool-resize').getElementsByClassName('tool-btn')) {
         el.addEventListener('click', () => {
+
             disableSizes()
             el.classList.add('tool-btn-chosen')
         })
     }
-
+    */
     pencilButton.click()
-    size4Button.click()
+    size4Button.classList.add('tool-btn-chosen')
     document.querySelector('#color-ico').style.backgroundColor = currentColor
+    clear(drawSize)
 }
 
 canvas.addEventListener('click', (e) => mouseDraw(e))
@@ -56,9 +74,9 @@ mainPanel.addEventListener('mouseup', () => canvas.removeEventListener('mousemov
 
 pencilButton.addEventListener('click', choosePencil)
 fillButton.addEventListener('click', chooseFill)
-size4Button.addEventListener('click', (e) => choosePencilSize(4))
-size16Button.addEventListener('click', (e) => choosePencilSize(16))
-size32Button.addEventListener('click', (e) => choosePencilSize(32))
+size4Button.addEventListener('click', (e) => choosePencilSize(size4Button, 4))
+size16Button.addEventListener('click', (e) => choosePencilSize(size16Button, 16))
+size32Button.addEventListener('click', (e) => choosePencilSize(size32Button, 32))
 colorButton.addEventListener('click', changeColor)
 
 function choosePencil(e) {
@@ -69,8 +87,13 @@ function chooseFill(e) {
     drawTool = TOOL.fill
 }
 
-function choosePencilSize(size) {
-    drawSize = size
+function choosePencilSize(e, size) {
+    if (confirm("При изменении размерности поля, холст будет очищен")) {
+        disableSizes()
+        e.classList.add('tool-btn-chosen')
+        drawSize = size
+        clear(size)
+    }
 }
 
 function changeColor() {
@@ -88,18 +111,26 @@ function mouseDraw(e) {
 
 function draw(x, y, color, tool) {
     let pxSize = canvasSize / drawSize
-    let pxOffsetX = Math.floor(x / pxSize) * pxSize
-    let pxOffsetY = Math.floor(y / pxSize) * pxSize
+    let matrixX = Math.floor(x / pxSize)
+    let matrixY = Math.floor(y / pxSize)
+    let pxOffsetX = matrixX * pxSize
+    let pxOffsetY = matrixY * pxSize
     if (tool === TOOL.pencil) {
-        drawPixel(pxOffsetX, pxOffsetY, pxSize, color)
+        drawPixel(matrixX, matrixY, pxSize, color)
+    }
+    else if (tool === TOOL.fill) {
+        fill(matrixX, matrixY, pxSize, color)
     }
 }
 
-function drawPixel(x, y, size, color) {
+function drawPixel(x, y, pxSize, color) {
+    colorMatrix[x][y] = color
+    let pxOffsetX = x * pxSize
+    let pxOffsetY = y * pxSize
     ctx.fillStyle = color
-    ctx.fillRect(x, y, size, size)
+    ctx.fillRect(pxOffsetX, pxOffsetY, pxSize, pxSize)
 }
 
-function fill(x, y, color) {
+function fill(x, y, size, color) {
 
 }
