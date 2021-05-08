@@ -137,32 +137,54 @@ function loadForm() {
     }))
 }
 
+let currentRect
 function makeTransparentRect(x, y, pxSize) {
-    let color = colorMatrix[x][y]
     let pxOffsetX = x * pxSize
     let pxOffsetY = y * pxSize
-    ctx.fillStyle = color
-    ctx.globalAlpha = 0.8
+    ctx.fillStyle = '#ffffff'
+    ctx.globalAlpha = 0.2
     ctx.fillRect(pxOffsetX, pxOffsetY, pxSize, pxSize)
 }
 
-function makeLight(e) {
-    const x = e.offsetX
-    const y = e.offsetY
+function makeLight(x, y) {
     let pxSize = canvasSize / drawSize
     let matrixX = Math.floor(x / pxSize)
     let matrixY = Math.floor(y / pxSize)
+    if (!currentRect || currentRect.x !== matrixX || currentRect.y !== matrixY) {
+        currentRect = {x: matrixX, y: matrixY}
+        refresh(currentColor, drawSize)
+        makeTransparentRect(matrixX, matrixY, pxSize)
+    }
 }
 
+function callMakeLight(e) {
+    const x = e.offsetX
+    const y = e.offsetY
+    makeLight(x, y)
+}
+
+function removeCurrentRect(e) {
+    currentRect = false
+    refresh(currentColor, drawSize)
+}
+
+canvas.addEventListener('mouseleave', removeCurrentRect)
+canvas.addEventListener('mousemove', callMakeLight)
 
 canvas.addEventListener('click', (e) => mouseDraw(e))
 canvas.addEventListener('mousedown', (e) => {
     if (drawTool === TOOL.pencil) {
+        canvas.removeEventListener('mousemove', callMakeLight)
+        removeCurrentRect(e)
         canvas.addEventListener('mousemove', mouseDraw)
     }
 })
 
-mainPanel.addEventListener('mouseup', () => canvas.removeEventListener('mousemove', mouseDraw))
+mainPanel.addEventListener('mouseup', (e) => {
+    canvas.removeEventListener('mousemove', mouseDraw)
+    canvas.addEventListener('mousemove', callMakeLight)
+    removeCurrentRect(e)
+})
 
 pencilButton.addEventListener('click', choosePencil)
 fillButton.addEventListener('click', chooseFill)
@@ -206,10 +228,10 @@ colorInput.addEventListener('change', (e) => {
 })
 
 function mouseDraw(e) {
-    draw(e.offsetX, e.offsetY, currentColor, drawTool)
+    draw(e.offsetX, e.offsetY, currentColor, drawTool, e)
 }
 
-function draw(x, y, color, tool) {
+function draw(x, y, color, tool, e) {
     let pxSize = canvasSize / drawSize
     let matrixX = Math.floor(x / pxSize)
     let matrixY = Math.floor(y / pxSize)
@@ -217,6 +239,7 @@ function draw(x, y, color, tool) {
     let pxOffsetY = matrixY * pxSize
     if (tool === TOOL.pencil) {
         drawPixel(matrixX, matrixY, pxSize, color)
+        //canvas.dispatchEvent(new Event('mousemove'))
         socket.send(JSON.stringify({
             type: 'draw',
             matrix: JSON.stringify(colorMatrix),
@@ -224,7 +247,6 @@ function draw(x, y, color, tool) {
     }
     else if (tool === TOOL.fill) {
         fill(matrixX, matrixY, pxSize, colorMatrix[matrixX][matrixY], color)
-        console.dir(colorMatrix)
         socket.send(JSON.stringify({
             type: 'draw',
             matrix: JSON.stringify(colorMatrix),
@@ -233,6 +255,8 @@ function draw(x, y, color, tool) {
     else {
         return;
     }
+
+    callMakeLight(e)
 }
 
 function drawPixel(x, y, pxSize, color) {
@@ -240,10 +264,15 @@ function drawPixel(x, y, pxSize, color) {
     let pxOffsetX = x * pxSize
     let pxOffsetY = y * pxSize
     ctx.fillStyle = color
+    ctx.globalAlpha = 1
     ctx.fillRect(pxOffsetX, pxOffsetY, pxSize, pxSize)
 }
 
 function fill(x, y, size, oldColor, fillColor) {
+    if (oldColor === fillColor) {
+        return;
+    }
+
     const maxPixel = colorMatrix.length
     if ((x < 0) || (x >= maxPixel) || (y < 0) || (y >= maxPixel)) {
         return;
