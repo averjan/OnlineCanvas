@@ -2,10 +2,12 @@
 import User from './user.js';
 // eslint-disable-next-line import/extensions
 import Canvas from './canvas.js';
-// eslint-disable-next-line import/extensions
+// eslint-disable-next-line no-unused-vars, import/extensions
 import ServerUI from './serverUI.js';
 // eslint-disable-next-line import/extensions
-import { mousePointer } from './mousePosition.js';
+import mousePointer from './mousePosition.js';
+// eslint-disable-next-line import/extensions
+import sizeButtonController from './controlSizeButtons.js';
 
 const canvas = document.querySelector('#user-canvas');
 const pencilButton = document.querySelector('#pencil-btn');
@@ -19,6 +21,7 @@ const mainPanel = document.querySelector('#main');
 const drawPanel = document.querySelector('#draw-panel');
 mousePointer.canvas = canvas;
 mousePointer.mainPanel = mainPanel;
+
 User.userCanvas = new Canvas(canvas);
 
 function disableTools() {
@@ -37,10 +40,8 @@ function disableSizes() {
   });
 }
 
-function highLightSizeButton(size) {
-  disableSizes();
-  document.getElementById(`size-${size}`).classList.add('tool-btn-chosen');
-}
+sizeButtonController.buttons = [size4Button, size16Button, size32Button];
+sizeButtonController.disableButtonsFunction = disableSizes;
 
 function loadForm() {
   pencilButton.click();
@@ -103,12 +104,12 @@ canvas.addEventListener('mousedown', () => User.mousedownHandler());
 pencilButton.addEventListener('click', User.choosePencil);
 fillButton.addEventListener('click', User.chooseFill);
 
-const changeSizeHandler = (size) => { highLightSizeButton(size); User.choosePencilSize(size); };
+const changeSizeHandler = (size) => {
+  sizeButtonController.highLightSizeButton(size);
+  User.choosePencilSize(size);
+};
+
 size4Button.addEventListener('click', () => changeSizeHandler(4));
 size16Button.addEventListener('click', () => changeSizeHandler(16));
 size32Button.addEventListener('click', () => changeSizeHandler(32));
 colorButton.addEventListener('click', changeColor);
-
-export {
-  highLightSizeButton, canvas,
-};

@@ -3,14 +3,9 @@ import * as Network from './network.js';
 // eslint-disable-next-line import/extensions
 import User from './user.js';
 // eslint-disable-next-line import/extensions
-import * as userUI from './userUI.js';
+import mousePointer from './mousePosition.js';
 // eslint-disable-next-line import/extensions
-import { mousePointer } from "./mousePosition.js";
-
-Network.socket.onopen = () => {
-  ServerUI(Network.socket);
-  Network.sendUserJoin();
-};
+import sizeButtonController from './controlSizeButtons.js';
 
 function ServerUI(socket) {
   // eslint-disable-next-line no-param-reassign
@@ -26,7 +21,7 @@ function ServerUI(socket) {
         break;
       }
       case 'change-pencil-size': {
-        userUI.highLightSizeButton(data.size);
+        sizeButtonController.highLightSizeButton(data.size);
         User.userCanvas.changePencilSize(data.size);
         break;
       }
@@ -41,7 +36,7 @@ function ServerUI(socket) {
       case 'info': {
         const newMatrix = JSON.parse(data.matrix);
         const newPxSize = newMatrix.length;
-        userUI.highLightSizeButton(newPxSize);
+        sizeButtonController.highLightSizeButton(newPxSize);
         User.userCanvas.changePencilSize(newPxSize);
         User.userCanvas.drawNewMatrix(newMatrix);
         const usersPointer = JSON.parse(data.mousePos);
@@ -62,5 +57,10 @@ function ServerUI(socket) {
     }
   });
 }
+
+Network.socket.onopen = () => {
+  ServerUI(Network.socket);
+  Network.sendUserJoin();
+};
 
 export default ServerUI;
