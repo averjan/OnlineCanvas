@@ -10,6 +10,7 @@ let size4Button = document.querySelector('#size-4')
 let size16Button = document.querySelector('#size-16')
 let size32Button = document.querySelector('#size-32')
 let mainPanel = document.querySelector('#main')
+let drawPanel = document.querySelector('#draw-panel')
 let colorMatrix = []
 
 socket.onmessage = ((e) => {
@@ -104,12 +105,13 @@ window.addEventListener('unload', (e) => {
     }))
 })
 
-mainPanel.addEventListener('mousemove', (e) => {
+drawPanel.addEventListener('mousemove', (e) => {
+    let canvRect = canvas.getBoundingClientRect()
     socket.send(JSON.stringify({
         type: 'mouse-move',
         id: socket.userId,
-        x: e.pageX,
-        y: e.pageY,
+        x: e.pageX - canvRect.left,
+        y: e.pageY - canvRect.top,
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
     }))
@@ -286,11 +288,11 @@ function setUserMousePosition(x, y, scrWidth, scrHeight, id) {
         m = createMousePointer(x, y, id)
     }
 
-    console.log(scrWidth)
+    let canvRect = canvas.getBoundingClientRect()
     //let realX = Math.round(x / scrWidth * window.innerWidth)
     //let realY = Math.round(y / scrHeight * window.innerHeight)
-    m.style.top = y + 'px'
-    m.style.left = x + 'px'
+    m.style.top = canvRect.top + y + 'px'
+    m.style.left = canvRect.left + x + 'px'
 }
 
 function deleteUserMousePointer(id) {
