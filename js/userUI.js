@@ -14,23 +14,40 @@ let colorMatrix = []
 
 socket.onmessage = ((e) => {
     let data = JSON.parse(e.data)
-    console.log(e)
     switch (data.type) {
         case 'draw' : {
-            console.dir(JSON.parse(data.matrix))
             colorMatrix = JSON.parse(data.matrix)
-            //copyMatrix(JSON.parse(data.matrix))
-            //colorMatrix[0][1] = "#000000"
-            /*
-            JSON.parse(data.matrix).forEach((v, i) => {
-                v.forEach((val, ind) => {
-                    colorMatrix[i][ind] = val
-                    console.log(val)
-                })
-            })
-            */
-            console.dir(colorMatrix)
             refresh(currentColor, drawSize)
+            break
+        }
+        case 'mose-move' : {
+            break;
+        }
+        case 'change-pencil-size' : {
+            changePencilSize(document.getElementById('size-' + data.size), data.size)
+            break;
+        }
+        case 'clear' : {
+            break;
+        }
+        case 'user-join' : {
+            socket.send(JSON.stringify({
+                type: 'info',
+                matrix: JSON.stringify(colorMatrix),
+                mousePos: null,
+            }))
+            break;
+        }
+        case 'info' : {
+            let newMatrix = JSON.parse(data.matrix)
+            let newPxSize = newMatrix.length
+            changePencilSize(document.getElementById('size-' + newPxSize), newPxSize)
+            colorMatrix = newMatrix
+            refresh(currentColor, drawSize)
+            break;
+        }
+        case 'user-disconnect' : {
+            break;
         }
     }
 })
@@ -41,10 +58,6 @@ function copyMatrix(matrix) {
         colorMatrix.push(new Array(drawSize))
         for (let j = 0; j < drawSize; j++) {
             colorMatrix[i][j] = matrix[i][j]
-            console.log(matrix[i][j])
-            if (matrix[i][j] === "#000000") {
-                console.log(colorMatrix)
-            }
         }
     }
 }
@@ -96,6 +109,9 @@ function loadForm() {
     size4Button.classList.add('tool-btn-chosen')
     document.querySelector('#color-ico').style.backgroundColor = currentColor
     clear(drawSize)
+    socket.send(JSON.stringify({
+        type: 'user-join'
+    }))
 }
 
 function makeTransparentRect(x, y, pxSize) {
@@ -140,12 +156,20 @@ function chooseFill(e) {
     drawTool = TOOL.fill
 }
 
+function changePencilSize(e, size) {
+    disableSizes()
+    e.classList.add('tool-btn-chosen')
+    drawSize = size
+    clear(size)
+}
+
 function choosePencilSize(e, size) {
     if (confirm("При изменении размерности поля, холст будет очищен")) {
-        disableSizes()
-        e.classList.add('tool-btn-chosen')
-        drawSize = size
-        clear(size)
+        changePencilSize(e, size)
+        socket.send(JSON.stringify({
+            type: 'change-pencil-size',
+            size: size,
+        }))
     }
 }
 
@@ -170,7 +194,6 @@ function draw(x, y, color, tool) {
     let pxOffsetY = matrixY * pxSize
     if (tool === TOOL.pencil) {
         drawPixel(matrixX, matrixY, pxSize, color)
-        console.log(colorMatrix)
         socket.send(JSON.stringify({
             type: 'draw',
             matrix: JSON.stringify(colorMatrix),
