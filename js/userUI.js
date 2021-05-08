@@ -21,7 +21,7 @@ socket.onmessage = ((e) => {
             break
         }
         case 'mouse-move' : {
-            setUserMousePosition(data.x, data.y, data.id)
+            setUserMousePosition(data.x, data.y, data.screenWidth, data.screenHeight, data.id)
             break;
         }
         case 'change-pencil-size' : {
@@ -110,6 +110,8 @@ mainPanel.addEventListener('mousemove', (e) => {
         id: socket.userId,
         x: e.pageX,
         y: e.pageY,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
     }))
 })
 
@@ -278,12 +280,15 @@ function createMousePointer(x, y, id) {
     return m
 }
 
-function setUserMousePosition(x, y, id) {
+function setUserMousePosition(x, y, scrWidth, scrHeight, id) {
     let m = document.getElementById(id)
     if (!m) {
         m = createMousePointer(x, y, id)
     }
 
+    console.log(scrWidth)
+    //let realX = Math.round(x / scrWidth * window.innerWidth)
+    //let realY = Math.round(y / scrHeight * window.innerHeight)
     m.style.top = y + 'px'
     m.style.left = x + 'px'
 }
