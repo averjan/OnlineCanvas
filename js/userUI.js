@@ -20,14 +20,16 @@ socket.onmessage = ((e) => {
             refresh(currentColor, drawSize)
             break
         }
-        case 'mose-move' : {
+        case 'mouse-move' : {
+            setUserMousePosition(data.x, data.y, data.id)
             break;
         }
         case 'change-pencil-size' : {
             changePencilSize(document.getElementById('size-' + data.size), data.size)
             break;
         }
-        case 'clear' : {
+        case 'set-id' : {
+            socket.userId = data.id
             break;
         }
         case 'user-join' : {
@@ -47,6 +49,7 @@ socket.onmessage = ((e) => {
             break;
         }
         case 'user-disconnect' : {
+            deleteUserMousePointer(data.id)
             break;
         }
     }
@@ -93,6 +96,22 @@ function disableSizes() {
         el.classList.remove('tool-btn-chosen')
     }
 }
+
+window.addEventListener('unload', (e) => {
+    socket.send(JSON.stringify({
+        type: 'user-disconnect',
+        id: socket.userId,
+    }))
+})
+
+mainPanel.addEventListener('mousemove', (e) => {
+    socket.send(JSON.stringify({
+        type: 'mouse-move',
+        id: socket.userId,
+        x: e.pageX,
+        y: e.pageY,
+    }))
+})
 
 pencilButton.addEventListener('click', () => {
     disableTools()
@@ -246,3 +265,30 @@ document.addEventListener('keypress', (e) => {
         colorButton.click()
     }
 })
+
+function createMousePointer(x, y, id) {
+    let m = document.createElement('img')
+    m.style.position = 'absolute'
+    m.style.zIndex = '2'
+    m.style.width = '20px'
+    m.style.height = '20px'
+    m.setAttribute('src', '/img/pointer/pointer.svg')
+    m.setAttribute('id', id)
+    mainPanel.appendChild(m)
+    return m
+}
+
+function setUserMousePosition(x, y, id) {
+    let m = document.getElementById(id)
+    if (!m) {
+        m = createMousePointer(x, y, id)
+    }
+
+    m.style.top = y + 'px'
+    m.style.left = x + 'px'
+}
+
+function deleteUserMousePointer(id) {
+    let e = document.getElementById(id)
+    e.remove()
+}

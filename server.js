@@ -40,6 +40,11 @@ server.on('request', (req, res) => {
 
 const socket = new WebSocket.Server( { server } )
 socket.on('connection', (ws) => {
+    ws.userId = uuidv4()
+    ws.send(JSON.stringify({
+        id: ws.userId,
+        type: 'set-id',
+    }))
     ws.on('message', (data) => {
         socket.clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
