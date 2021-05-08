@@ -1,11 +1,18 @@
 const http = require('http')
 const fs = require('fs')
 const WebSocket = require('ws')
+const { v4: uuidv4 } = require('uuid')
 
 const PORT = 4000
 
 const server = http.createServer()
 server.on('request', (req, res) => {
+    if (req.url === '/get_uid') {
+        req.writeHead(200, { 'Content-Type': 'application/json' });
+        req.end(JSON.stringify({ id: uuidv4() }), 'utf-8');
+        return;
+    }
+
     let filePath
     if (req.url === "/") {
         filePath = 'index.html'

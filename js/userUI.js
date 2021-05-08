@@ -12,19 +12,61 @@ let size32Button = document.querySelector('#size-32')
 let mainPanel = document.querySelector('#main')
 let colorMatrix = []
 
+socket.onmessage = ((e) => {
+    let data = JSON.parse(e.data)
+    console.log(e)
+    switch (data.type) {
+        case 'draw' : {
+            console.dir(JSON.parse(data.matrix))
+            colorMatrix = JSON.parse(data.matrix)
+            //copyMatrix(JSON.parse(data.matrix))
+            //colorMatrix[0][1] = "#000000"
+            /*
+            JSON.parse(data.matrix).forEach((v, i) => {
+                v.forEach((val, ind) => {
+                    colorMatrix[i][ind] = val
+                    console.log(val)
+                })
+            })
+            */
+            console.dir(colorMatrix)
+            refresh(currentColor, drawSize)
+        }
+    }
+})
+
+function copyMatrix(matrix) {
+    colorMatrix = []
+    for (let i = 0; i < drawSize; i++) {
+        colorMatrix.push(new Array(drawSize))
+        for (let j = 0; j < drawSize; j++) {
+            colorMatrix[i][j] = matrix[i][j]
+            console.log(matrix[i][j])
+            if (matrix[i][j] === "#000000") {
+                console.log(colorMatrix)
+            }
+        }
+    }
+}
+
 function rebuildMatrix(size, color) {
     //colorMatrix = Array(size).fill(Array(size).fill(color))
-    colorMatrix = Array(size).fill(null).map(() => Array(size).fill(color));
+    //colorMatrix = Array(size).fill(null).map(() => Array(size).fill(null).map(() => color));
+    colorMatrix = []
+    for (let i = 0; i < size; i++) {
+        colorMatrix.push(new Array(size).fill(color))
+    }
+
     refresh(color, size)
 }
 
 function refresh(color, size) {
     const realSize = canvasSize / size
-    colorMatrix.forEach((v, y) => v.forEach((val, x) => drawPixel(x, y, realSize, val)))
+    colorMatrix.forEach((v, x) => v.forEach((val, y) => drawPixel(x, y, realSize, val)))
 }
 
 function clear(size) {
-    rebuildMatrix(size, '#ffffff')
+    rebuildMatrix(size, '#FFFFFF')
 }
 
 function disableTools() {
@@ -128,9 +170,22 @@ function draw(x, y, color, tool) {
     let pxOffsetY = matrixY * pxSize
     if (tool === TOOL.pencil) {
         drawPixel(matrixX, matrixY, pxSize, color)
+        console.log(colorMatrix)
+        socket.send(JSON.stringify({
+            type: 'draw',
+            matrix: JSON.stringify(colorMatrix),
+        }))
     }
     else if (tool === TOOL.fill) {
         fill(matrixX, matrixY, pxSize, colorMatrix[matrixX][matrixY], color)
+        console.dir(colorMatrix)
+        socket.send(JSON.stringify({
+            type: 'draw',
+            matrix: JSON.stringify(colorMatrix),
+        }))
+    }
+    else {
+        return;
     }
 }
 

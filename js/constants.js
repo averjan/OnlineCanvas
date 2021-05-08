@@ -4,6 +4,7 @@ let drawSize = 4
 let canvasSize = 512
 let currentColor = '#000000'
 let user
+let socket = new WebSocket('ws://localhost:4000')
 
 /*
 module.exports = {
