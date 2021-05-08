@@ -22,7 +22,7 @@ const size32Button = document.querySelector('#size-32');
 const mainPanel = document.querySelector('#main');
 const drawPanel = document.querySelector('#draw-panel');
 let colorMatrix = [];
-//const pointers = {};
+// const pointers = {};
 let pointer;
 
 function drawPixel(x, y, pxSize, color) {
@@ -142,11 +142,11 @@ function disableSizes() {
 }
 
 window.onbeforeunload = () => {
-    socket.send(JSON.stringify({
-        type: 'user-disconnect',
-        id: socket.userId,
-    }));
-}
+  socket.send(JSON.stringify({
+    type: 'user-disconnect',
+    id: socket.userId,
+  }));
+};
 
 window.addEventListener('unload', () => {
   socket.send(JSON.stringify({
@@ -157,9 +157,9 @@ window.addEventListener('unload', () => {
 
 drawPanel.addEventListener('mousemove', (e) => {
   const canvRect = canvas.getBoundingClientRect();
-    let x = e.pageX - canvRect.left;
-    let y = e.pageY - canvRect.top;
-  pointer = { x: x, y: y, id: socket.userId }
+  const x = e.pageX - canvRect.left;
+  const y = e.pageY - canvRect.top;
+  pointer = { x, y, id: socket.userId };
   socket.send(JSON.stringify({
     type: 'mouse-move',
     id: socket.userId,
@@ -279,7 +279,7 @@ function setUserMousePosition(x, y, scrWidth, scrHeight, id) {
 function deleteUserMousePointer(id) {
   const e = document.getElementById(id);
   if (e) {
-      e.remove();
+    e.remove();
   }
 }
 
@@ -331,7 +331,12 @@ socket.onmessage = ((e) => {
       colorMatrix = newMatrix;
       refresh(currentColor, drawSize);
       const usersPointer = JSON.parse(data.mousePos);
-      setUserMousePosition(usersPointer.x, usersPointer.y, window.innerWidth, window.innerHeight, usersPointer.id)
+      setUserMousePosition(
+        usersPointer.x,
+        usersPointer.y,
+        window.innerWidth, window.innerHeight,
+        usersPointer.id,
+      );
       break;
     }
     case 'user-disconnect': {
