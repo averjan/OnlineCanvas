@@ -123,6 +123,20 @@ class Canvas {
     changePencilSize(size) {
       this.drawSize = size;
       this.clear(size);
+      this.initialPicture();
+    }
+
+    initialPicture() {
+      const pxSize = this.canvasSize / this.drawSize;
+      this.fill(0, 0, pxSize, this.colorMatrix[0][0], '#000000');
+      const color = '#123fff';
+      const middle = Math.round(this.colorMatrix.length / 2);
+      for (let i = 0; i < this.colorMatrix.length; i += 1) {
+        this.drawPixel(middle, i, pxSize, color);
+        this.drawPixel(middle - 1, i, pxSize, color);
+        this.drawPixel(i, middle, pxSize, color);
+        this.drawPixel(i, middle - 1, pxSize, color);
+      }
     }
 }
 

@@ -10,6 +10,7 @@ class User {
 
     static init() {
       User.userCanvas.clear(this.userCanvas.drawSize);
+      User.userCanvas.initialPicture()
       // Network.sendUserJoin()
     }
 
